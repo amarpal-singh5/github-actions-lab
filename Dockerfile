@@ -4,6 +4,6 @@ WORKDIR /app
 
 COPY . .
 
-RUN pip install pytest
+RUN pip install -r requirements.txt
 
-CMD ["python", "app.py"]
+CMD ["pytest"]
