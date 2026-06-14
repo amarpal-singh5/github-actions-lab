@@ -1,9 +1,14 @@
-name: First Workflow
+name: CI Pipeline
 
 on: push
 
 jobs:
-  hello:
+  test:
     runs-on: ubuntu-latest
+
     steps:
-      - run: echo "Hello CI/CD"
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Show files
+        run: ls -al
