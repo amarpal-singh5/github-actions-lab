@@ -1,0 +1,55 @@
+name: CI-CD GitOps Pipeline
+
+on:
+  push:
+    branches: 
+
+      - main
+
+    paths-ignore:
+      - 'gitops/**'
+    
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set IMAGE TAG
+        run: echo "IMAGE_TAG=${GITHUB_SHA}" >> $GITHUB_ENV
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build Docker image
+        run: |
+          docker build -t ghcr.io/${{ github.repository }}:${{ env.IMAGE_TAG }} .
+
+      - name: Push Docker image
+        run: |
+          docker push ghcr.io/${{ github.repository }}:${{ env.IMAGE_TAG }}
+
+      - name: Update GitOps manifest
+        run: |
+          sed -i "s|image: .*|image: ghcr.io/${{ github.repository }}:${{ env.IMAGE_TAG }}|g" gitops/deployment.yaml
+
+      - name: Commit updated manifest
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add gitops/deployment.yaml
+          git commit -m "Update image tag to ${{ env.IMAGE_TAG }}" || echo "No changes"
+          git push
