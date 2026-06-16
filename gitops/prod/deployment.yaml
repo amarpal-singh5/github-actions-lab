@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: github-actions-lab
+
+spec:
+  replicas: 4 
+
+  selector:
+    matchLabels:
+      app: github-actions-lab
+
+  template:
+    metadata:
+      labels:
+        app: github-actions-lab
+
+    spec:
+      containers:
+        - name: github-actions-lab
+          image: ghcr.io/amarpal-singh5/github-actions-lab:4fc77c80c596a38fd09dfb5f1ac172c6c04804c7
+          ports:
+            - containerPort: 5000
+
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 5000
+            initialDelaySeconds: 3
+            periodSeconds: 5
+
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 5000
+            initialDelaySeconds: 10
+            periodSeconds: 10
