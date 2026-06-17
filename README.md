@@ -8,20 +8,27 @@ This project demonstrates a complete end-to-end software delivery workflow used 
 
 ## Architecture Overview
 
-```text
-Developer
-   ↓
-GitHub (Source Code)
-   ↓
-GitHub Actions (CI Pipeline)
-   ↓
-GHCR (Container Registry)
-   ↓
-ArgoCD (GitOps Controller)
-   ↓
-Kubernetes Cluster
-```
+```mermaid
+flowchart TD
 
+A[Developer Pushes Code] --> B[GitHub Repository]
+
+B --> C[GitHub Actions CI Pipeline]
+
+C --> D[Build Docker Image]
+
+D --> E[Push Image to GHCR]
+
+E --> F[Update Kubernetes Manifest]
+
+F --> G[Commit GitOps Change]
+
+G --> H[ArgoCD]
+
+H --> I[Kubernetes Cluster]
+
+I --> J[Running Application]
+```
 ---
 
 ## Tech Stack
