@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: kubernetes-gitops-platform
+  name: kubernetes-gitops-platform-dev
   namespace: argocd
 
 spec:
@@ -10,7 +10,7 @@ spec:
   source:
     repoURL: https://github.com/amarpal-singh5/kubernetes-gitops-platform.git
     targetRevision: main
-    path: gitops
+    path: gitops/dev
 
   destination:
     server: https://kubernetes.default.svc
