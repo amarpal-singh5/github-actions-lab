@@ -1,24 +1,24 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: github-actions-lab
+  name: kubernetes-gitops-platform
 
 spec:
   replicas: 3
 
   selector:
     matchLabels:
-      app: github-actions-lab
+      app: kubernetes-gitops-platform
 
   template:
     metadata:
       labels:
-        app: github-actions-lab
+        app: kubernetes-gitops-platform
 
     spec:
       containers:
-        - name: github-actions-lab
-          image: ghcr.io/amarpal-singh5/github-actions-lab:70c6ebf33d3b6dc1efe14d3d56a0b6c3f179706c
+        - name: kubernetes-gitops-platform
+          image: ghcr.io/amarpal-singh5/kubernetes-gitops-platform:70c6ebf33d3b6dc1efe14d3d56a0b6c3f179706c
           ports:
             - containerPort: 5000
 
