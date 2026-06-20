@@ -44,7 +44,7 @@ jobs:
 
       - name: Update GitOps manifest
         run: |
-          sed -i "s|image: .*|image: ghcr.io/${{ github.repository }}:${{ env.IMAGE_TAG }}|g" gitops/deployment.yaml
+          sed -i "s|image: .*|image: ghcr.io/${{ github.repository }}:${{ env.IMAGE_TAG }}|g" gitops/dev/deployment.yaml
 
       - name: Commit updated manifest
         run: |
