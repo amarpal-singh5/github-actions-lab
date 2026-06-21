@@ -1,0 +1,21 @@
+# Ignore Git internals and localized tracking
+.git
+.gitignore
+
+# Ignore local cluster definitions and GitOps platform manifests
+kind-config.yaml
+bootstrap.yaml
+gitops/
+.github/
+
+# Ignore documentation
+README.md
+docs/
+
+# Scalable testing exclusions matching  pipeline discovery pattern
+src/test_*.py
+src/*_test.py
+**/__pycache__
+*.pyc
+*.pyo
+.pytest_cache/
