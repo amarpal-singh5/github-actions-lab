@@ -10,7 +10,16 @@ on:
       - 'kind-config.yaml'
       - 'bootstrap.yaml'
       - '.dockerignore'
-
+  # Run the pipeline on PRs targeting main
+  pull_request:
+    branches:
+      - main
+    paths-ignore:
+      - 'gitops/**'
+      - 'README.md'
+      - 'kind-config.yaml'
+      - 'bootstrap.yaml'
+      - '.dockerignore'
 jobs:
   # ==========================================
   # JOB 1: CONTINUOUS INTEGRATION (QUALITY GATE)
