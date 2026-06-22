@@ -10,7 +10,6 @@ on:
       - 'kind-config.yaml'
       - 'bootstrap.yaml'
       - '.dockerignore'
-  # Run the pipeline on PRs targeting main
   pull_request:
     branches:
       - main
@@ -20,12 +19,14 @@ on:
       - 'kind-config.yaml'
       - 'bootstrap.yaml'
       - '.dockerignore'
+
 jobs:
   # ==========================================
-  # JOB 1: CONTINUOUS INTEGRATION (QUALITY GATE)
+  # JOB 1: CONTINUOUS INTEGRATION (PRs & Main)
   # ==========================================
   test:
     runs-on: ubuntu-latest
+    # Does test need a condition? No! It runs on both by default, acting as our gatekeeper.
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -34,33 +35,35 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-          cache: 'pip' # Caches pip layers to speed up future runs
+          cache: 'pip'
 
       - name: Install Runtime and Test Dependencies
         run: |
           python -m pip install --upgrade pip
-          # Pytest is natively installed here via your requirements.txt
           pip install -r src/requirements.txt
 
       - name: Execute Unit Tests via Pytest
         run: |
-          # Recursively discovers and executes all matching test files under src/
-          # If a test fails, pytest exits with code 1, halting the pipeline instantly
           pytest src/
 
   # ==========================================
-  # JOB 2: CONTINUOUS DELIVERY (BUILD & DEPLOY)
+  # JOB 2: CONTINUOUS DELIVERY (Post-Merge Push ONLY)
   # ==========================================
   build-and-push:
     runs-on: ubuntu-latest
-    needs: test # CRITICAL: Gated tightly behind successful unit tests
+    needs: test
+    # This job will cleanly SKIP on PRs and ONLY execute post-merge
+    if: github.event_name == 'push'
     permissions:
       contents: write
       packages: write
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4 # Mandatory for the new, isolated workspace runner
+        uses: actions/checkout@v4
+        with:
+          # Tells GitHub to pull down the full history so rebasing works seamlessly
+          fetch-depth: 0 
 
       - name: Log in to GitHub Container Registry (GHCR)
         uses: docker/login-action@v3
@@ -91,7 +94,6 @@ jobs:
           git add gitops/overlays/dev/kustomization.yaml
           git commit -m "chore(deploy): upgrade dev image to ${{ github.sha }}" || echo "No changes"
           
-          # Handled as a documented known limitation for team scale;
-          # natively avoids common branch drift via rebase mechanics
+          # Now that this only runs post-merge, rebase will cleanly fast-forward
           git pull --rebase origin main
           git push origin main
